@@ -5,6 +5,8 @@ const path = require('node:path')
 
 // Ejercicio 2: crear servidor HTTP con Express
 function startServer () {
+  app.disable('x-powered-by')
+
   app.get('/', (req, res) => {
     res.send('<h1>¡Hola mundo!</h1>')
   })
