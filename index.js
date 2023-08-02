@@ -66,10 +66,9 @@ function startServer () {
 
   const PORT = process.env.PORT ?? 1234
   const server = http.createServer(processRequest)
-  server.listen(PORT, () => {
+  return server.listen(PORT, () => {
     console.log(`server listening on port http://localhost:${PORT}`)
   })
-  return server
 }
 
 module.exports = {

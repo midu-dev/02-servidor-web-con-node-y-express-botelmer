@@ -9,8 +9,10 @@ function startServer () {
   app.use(express.static('assets'))
   app.use(express.json())
 
-  app.get('/', (req, res) => {
-    res.send('<h1>¡Hola mundo!</h1>')
+  app.all('/', (req, res) => {
+    if (req.method === 'GET') return res.send('<h1>¡Hola mundo!</h1>')
+
+    res.status(405).send('<h1>405 Method Not Allowed</h1>')
   })
 
   app.get('/logo.webp', (req, res) => {
@@ -22,24 +24,20 @@ function startServer () {
     res.status(404).send('<h1>404</h1>')
   })
 
-  app.post('/contacto', (req, res) => {
-    const data = req.body
-    res.status(201).json(data)
-  })
-
-  app.all('/', (req, res) => {
-    res.status(405).send('<h1>405 Method Not Allowed</h1>')
-  })
-
   app.all('/contacto', (req, res) => {
+    if (req.method === 'POST') return res.status(201).json(req.body)
+
     res.status(405).send('<h1>405 Method Not Allowed</h1>')
+  })
+
+  app.use((req, res) => {
+    res.status(404).send('<h1>404</h1>')
   })
 
   const PORT = process.env.PORT ?? 1234
-  const server = app.listen(PORT, () => {
+  return app.listen(PORT, () => {
     console.log(`server listening on port http://localhost:${PORT}`)
   })
-  return server
 }
 
 module.exports = {
