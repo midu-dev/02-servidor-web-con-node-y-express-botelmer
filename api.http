@@ -1,0 +1,8 @@
+POST http://localhost:1234/contacto
+Content-Type: application/json
+
+{
+    "name": "midudev",
+    "email": "midudev@gmail.com",
+    "message": "Hola mundo"
+}
