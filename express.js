@@ -1,20 +1,21 @@
 const express = require('express')
 const app = express()
 const fs = require('node:fs')
-const path = require('node:path')
 
 // Ejercicio 2: crear servidor HTTP con Express
 function startServer () {
   app.disable('x-powered-by')
+
+  app.use(express.static('assets'))
+  app.use(express.json())
 
   app.get('/', (req, res) => {
     res.send('<h1>¡Hola mundo!</h1>')
   })
 
   app.get('/logo.webp', (req, res) => {
-    const pathImg = path.join('assets', 'logo.webp')
-    const img = fs.readFileSync(pathImg, '')
-    res.header('Content-Type', 'image/webp').send(img)
+    const img = fs.readFileSync('logo.webp')
+    res.send(img)
   })
 
   app.get('/404', (req, res) => {
@@ -22,16 +23,8 @@ function startServer () {
   })
 
   app.post('/contacto', (req, res) => {
-    let body = ''
-
-    req.on('data', (chunk) => {
-      body += chunk.toString()
-    })
-
-    req.on('end', () => {
-      const data = JSON.parse(body)
-      res.status(201).json(data)
-    })
+    const data = req.body
+    res.status(201).json(data)
   })
 
   app.all('/', (req, res) => {
