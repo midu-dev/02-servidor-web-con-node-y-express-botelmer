@@ -16,8 +16,13 @@ function startServer () {
   })
 
   app.get('/logo.webp', (req, res) => {
-    const img = fs.readFileSync('logo.webp')
-    res.send(img)
+    fs.readFile('logo.webp', (err, data) => {
+      if(err) {
+        res.statusCode = 500
+        return res.end('<h1>500 Internal Server Error</h1>')
+      }
+      return res.send(data)
+    })
   })
 
   app.get('/404', (req, res) => {

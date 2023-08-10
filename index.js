@@ -6,61 +6,57 @@ const path = require('node:path')
 function startServer () {
   const processRequest = (req, res) => {
     const { method, url } = req
+    res.setHeader('Content-Type', 'text/html; charset=utf-8')
+    let incorrectMethod = false;
+    switch (url) {
+      case '/':
+        if (method !== 'GET') { incorrectMethod = true; break }
+        return res.end('<h1>¡Hola mundo!</h1>')
+      case '/logo.webp':{
+        if (method !== 'GET') { incorrectMethod = true; break }
 
-    switch (method) {
-      case 'GET': {
-        switch (url) {
-          case '/':
+        const pathImg = path.join('assets', 'logo.webp')
+        res.setHeader('Content-Type', 'image/webp')
+
+        fs.readFile(pathImg, (err, data) => {
+          if(err) {
             res.setHeader('Content-Type', 'text/html; charset=utf-8')
-            return res.end('<h1>¡Hola mundo!</h1>')
-
-          case '/logo.webp':{
-            const pathImg = path.join('assets', 'logo.webp')
-            res.setHeader('Content-Type', 'image/webp')
-            const img = fs.readFileSync(pathImg, '')
-            return res.end(img)
+            res.statusCode = 500
+            return res.end('<h1>500 Internal Server Error</h1>')
           }
-          case '/404':
-            res.statusCode = 404
-            return res.end('<h1>404</h1>')
-
-          default:
-            res.statusCode = 404
-            res.setHeader('Content-Type', 'text/html; charset=utf-8')
-            return res.end('<h1>404</h1>')
-        }
-      }
-
-      case 'POST':
-        switch (url) {
-          case '/contacto':{
-            let body = ''
-
-            req.on('data', (chunk) => {
-              body += chunk.toString()
-            })
-
-            req.on('end', () => {
-              const data = JSON.parse(body)
-              res.writeHead(201, {
-                'Content-Type': 'application/json; charset=utf-8'
-              })
-              return res.end(JSON.stringify(data))
-            })
-
-            break
-          }
-          default:
-            res.statusCode = 405
-            res.setHeader('Content-Type', 'text/html; charset=utf-8')
-            return res.end('<h1>405</h1>')
-        }
+          return res.end(data)
+        })
         break
+      }
+      case '/404':
+        if (method !== 'GET') { incorrectMethod = true; break }
+        res.statusCode = 404
+        return res.end('<h1>404</h1>')
+      case '/contacto':{
+        if (method !== 'POST') { incorrectMethod = true; break }
 
+        let body = ''
+
+        req.on('data', (chunk) => {
+          body += chunk.toString()
+        })
+
+        req.on('end', () => {
+          const data = JSON.parse(body)
+          res.writeHead(201, {
+            'Content-Type': 'application/json; charset=utf-8'
+          })
+          return res.end(JSON.stringify(data))
+        })
+        break
+      }
       default:
-        res.statusCode = 405
-        res.setHeader('Content-Type', 'text/html; charset=utf-8')
-        return res.end('<h1>Método no soportado</h1>')
+        res.statusCode = 404
+        return res.end('<h1>404</h1>')
+    }
+    if(incorrectMethod){
+      res.statusCode = 405
+      return res.end('<h1>405 Method Not Allowed</h1>')
     }
   }
 
